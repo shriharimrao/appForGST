@@ -15,7 +15,7 @@ def register(request):
 
         if form.is_valid():
             form.save()
-            return redirect ('login')
+            return redirect ('my-login')
     context={'form':form}
     return render(request,'webapp/register.html',context=context)
     
@@ -35,7 +35,7 @@ def my_login(request):
                 auth.login(request,user)
                 return redirect('dashboard')
     context={'form':form}
-    return render(request,'webapp/my_login.html',context=context)
+    return render(request,'webapp/my-login.html',context=context)
                 
 
 
