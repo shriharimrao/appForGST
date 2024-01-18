@@ -2,6 +2,7 @@ from django.shortcuts import render,redirect
 from .forms import CreateUserForm, LoginForm
 from django.contrib.auth.models import auth
 from django.contrib.auth import authenticate
+from django.contrib.auth.decorators import login_required
 
 #home page
 def home(request):
@@ -36,6 +37,11 @@ def my_login(request):
                 return redirect('dashboard')
     context={'form':form}
     return render(request,'webapp/my-login.html',context=context)
+#create dashboard
+@login_required (login_url='my-login')
+def dashboard(request):
+    
+    return render (request,'webapp/dashboard.html')
 
 
 
@@ -55,8 +61,7 @@ def my_login(request):
 
 
 
-   
-                
+
 #user logout
 def user_logout(request):
     auth.logout(request)
