@@ -5,11 +5,15 @@
 
 <hr>
 
-<a class="btn btn-outline-primary btn-sm" href="{% url '' %}">
+<form method="POST" autocomplete="off">
 
-    enter your GSTIN  &nbsp; <i class="fa fa-plus-circle" aria-hidden="true"></i>
+    {% csrf_token %}
 
-</a>
+    {{form.gstin}}
+    <button type="submit" class="btn btn-primary">enter GSTIN &nbsp;</i> </button>
+
+
+</form>
 <hr> 
 
     <table class="table table-hover table-bordered">
@@ -24,6 +28,21 @@
             </tr>
         </thead>
         <tbody>
+            {% if gstnums %}
+
+            {% for gstnum in gstnums %}
+
+            <tr>
+
+                <td> {{gstnum.gstin}} </td>
+
+                <td> <a class="btn btn-success btn-sm" href="{% url 'gstnum'%}"> <i class="fa fa-eye" aria-hidden="true"></i> </a> </td>
+
+            </tr>
+
+            {% endfor %}
+        
+        {% endif %}
 
         </tbody>
     </table>

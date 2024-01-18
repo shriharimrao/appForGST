@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect
-from .forms import CreateUserForm, LoginForm
+from .forms import CreateUserForm, LoginForm, GSTINForm
 from django.contrib.auth.models import auth
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
@@ -40,8 +40,22 @@ def my_login(request):
 #create dashboard
 @login_required (login_url='my-login')
 def dashboard(request):
+    form=GSTINForm()
+    if request.method=="POST":
+        form =GSTINForm(request,request.POST)
+        if form.is_valid():
+            gstin=request.POST.get('gstin')
+          
+
+            user=authenticate(request,gstin=gstin)
+
+            if user is not None:
+                auth.login(request,user)
+                return redirect('create-invoice')
+    context={'form':form}
+    return render(request,'webapp/dashboard.html',context=context)
     
-    return render (request,'webapp/dashboard.html')
+
 
 
 

@@ -16,5 +16,6 @@ class LoginForm(AuthenticationForm):
     username=forms.CharField(widget=TextInput())
     password=forms.CharField(widget=PasswordInput())
 
-#enter your GST Number
-    
+#create GSTIN
+class GSTINForm(forms.Form):
+    gstin=forms.CharField(max_length=20)
