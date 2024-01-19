@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'webapp',
     'import_export',
     'crispy_forms',
+    'pandas',
+
 
 ]
 CRISPY_TEMPLATE_PACK='bootstrap4'

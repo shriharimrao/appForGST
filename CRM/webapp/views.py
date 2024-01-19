@@ -1,8 +1,16 @@
 from django.shortcuts import render,redirect
-from .forms import CreateUserForm, LoginForm, GSTINForm
+from .forms import UserRegistrationForm, LoginForm ,CreateInvoice,UpdateInvoice
 from django.contrib.auth.models import auth
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
+import pandas as pd
+from .models import Item
+from django.contrib import messages
+from django.forms import ValidationError
+from decimal import Decimal
+
+
+
 
 #home page
 def home(request):
@@ -10,9 +18,9 @@ def home(request):
 
 #register
 def register(request):
-    form=CreateUserForm()
+    form=UserRegistrationForm()
     if request.method=="POST":
-        form=CreateUserForm(request.POST)
+        form=UserRegistrationForm(request.POST)
 
         if form.is_valid():
             form.save()
@@ -37,27 +45,96 @@ def my_login(request):
                 return redirect('dashboard')
     context={'form':form}
     return render(request,'webapp/my-login.html',context=context)
-#create dashboard
-@login_required (login_url='my-login')
+
+
+@login_required(login_url='my-login')
 def dashboard(request):
-    form=GSTINForm()
-    if request.method=="POST":
-        form =GSTINForm(request,request.POST)
+    items = Item.objects.all()
+    form =CreateInvoice() # Define the form outside the conditional block
+
+    if request.method == 'POST':
+        input_method = request.POST.get('input_method')
+        if input_method == 'upload_excel':
+            try:
+                excel_file = request.FILES['excel_file']
+                df = pd.read_excel(excel_file)
+
+                # Validation for Excel data
+                required_columns = ['name', 'quantity', 'unit', 'rate']
+                if not all(column in df.columns for column in required_columns):
+                    messages.error(request, "Missing required columns in Excel file.")
+                    return redirect('dashboard')
+
+                for index, row in df.iterrows():
+                    try:
+                        item = Item(
+                            name=row['name'],
+                            quantity=row['quantity'],
+                            unit=row['unit'],
+                            rate=row['rate']
+                        )
+                        # Trigger Django model validation
+                        item.save()
+                    except ValidationError as e:
+                        messages.error(request, str(e))
+            except KeyError:
+                messages.error(request, "Please select an Excel file to upload.")
+        elif input_method == 'create_data':
+                
+                my_records = Item.objects.all()
+
+                context = {'items': my_records}
+
+                return render(request, 'webapp/dashboard.html', context=context)
+
+    # Define the context variable here
+    context = {'form': form, 'items': items}
+    return render(request, 'webapp/dashboard.html', context=context)
+
+
+#create invoice
+@login_required(login_url='my-login')
+def create_invoice(request):
+    form = CreateInvoice()
+    if request.method == 'POST':
+            
+        form = CreateInvoice(request.POST)
         if form.is_valid():
-            gstin=request.POST.get('gstin')
-          
+            form.save()
+            return redirect('dashboard')
+    context={'form': form}
+    return render(request, 'webapp/create-invoice.html',context=context )
 
-            user=authenticate(request,gstin=gstin)
-
-            if user is not None:
-                auth.login(request,user)
-                return redirect('create-invoice')
+#update invoice
+@login_required(login_url='my-login')
+def update_invoice(request ,pk):
+    item=Item.objects.get(id=pk)
+    form=UpdateInvoice(instance=item)
+    if  request.method=="POST":
+        form=UpdateInvoice(request.POST,instance=item)
+        if form.is_valid():
+            form.save()
+            return redirect("dashboard")
     context={'form':form}
-    return render(request,'webapp/dashboard.html',context=context)
-    
+    return render(request, 'webapp/update-invoice.html',context=context )
 
+#view single record
+@login_required(login_url='my-login')
+def singular_invoice(request, pk):
 
+    all_records = Item.objects.get(id=pk)
 
+    context = {'item':all_records}
+
+    return render(request, 'webapp/view-invoice.html', context=context)
+
+#delete invoice
+@login_required(login_url='my-login')
+def delete_invoice(request, pk):
+    item=Item.objects.get(id=pk)
+    item.delete()
+    messages.success(request,"your invoice was deletd!")
+    return redirect("dashboard")
 
 
 

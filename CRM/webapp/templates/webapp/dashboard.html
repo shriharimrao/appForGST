@@ -1,50 +1,56 @@
 {% extends 'webapp/base.html' %}
 
 {% block content %}
-<h5> Welcome, {{user}}! 👋 </h5>
+    <h5>Welcome, {{ user }}! </h5>
 
-<hr>
+    <hr>
 
-<form method="POST" autocomplete="off">
+    
+        <div class="col-md-6">
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="file" name="excel_file">
+                <button type="submit" class="btn btn-primary" name="upload_excel">Upload</button>
+            </form>
+            <br>
+            <br>
+        </div>
+        <br>
+        <a class="btn btn-outline-primary" href="{% url 'create-invoice' %}">
 
-    {% csrf_token %}
+            Create a new invoice &nbsp; <i class="fa fa-plus-circle" aria-hidden="true"></i>
+    
+        </a>
 
-    {{form.gstin}}
-    <button type="submit" class="btn btn-primary">enter GSTIN &nbsp;</i> </button>
-
-
-</form>
-<hr> 
+    <hr>
 
     <table class="table table-hover table-bordered">
-
         <thead class="table-light">
-
-            <tr>
-
-                <th scope="col"> GSTIN </th>
-                <th scope="col"> View </th>
-
-            </tr>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Name</th>
+            <th scope="col">Quantity</th>
+            <th scope="col">Unit</th>
+            <th scope="col">Rate</th>
+            <th scope="col">Views</th>
+        </tr>
         </thead>
         <tbody>
-            {% if gstnums %}
-
-            {% for gstnum in gstnums %}
-
-            <tr>
-
-                <td> {{gstnum.gstin}} </td>
-
-                <td> <a class="btn btn-success btn-sm" href="{% url 'gstnum'%}"> <i class="fa fa-eye" aria-hidden="true"></i> </a> </td>
-
-            </tr>
-
+        {% if items %}
+            {% for item in items %}
+                <tr>
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.unit }}</td>
+                    <td>{{ item.rate }}</td>
+                    <td>
+                    <a class="btn btn-success btn-sm" href="{% url 'item' item.id %}"> <i class="fa fa-eye" aria-hidden="true"></i> </a>
+                    </td>
+                </tr>
             {% endfor %}
-        
         {% endif %}
-
         </tbody>
     </table>
-    
+
 {% endblock %}
