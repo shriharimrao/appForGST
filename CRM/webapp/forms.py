@@ -53,6 +53,10 @@ class CreateInvoice(forms.ModelForm):
         model = Item
         fields = ['name', 'quantity', 'unit', 'rate']
 
+#upload invoice
+class ExcelFileForm(forms.Form):
+    excel_file = forms.FileField()
+
 #update invoice
 class UpdateInvoice(forms.ModelForm):
     class Meta:

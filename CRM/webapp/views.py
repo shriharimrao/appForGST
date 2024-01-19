@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect
-from .forms import UserRegistrationForm, LoginForm ,CreateInvoice,UpdateInvoice
+from .forms import UserRegistrationForm, LoginForm ,CreateInvoice,UpdateInvoice,ExcelFileForm
 from django.contrib.auth.models import auth
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
@@ -7,6 +7,7 @@ import pandas as pd
 from .models import Item
 from django.contrib import messages
 from django.forms import ValidationError
+from openpyxl import load_workbook
 from decimal import Decimal
 
 
@@ -50,13 +51,15 @@ def my_login(request):
 @login_required(login_url='my-login')
 def dashboard(request):
     items = Item.objects.all()
-    form =CreateInvoice() # Define the form outside the conditional block
+    form =ExcelFileForm()  # Define the form outside the conditional block
 
     if request.method == 'POST':
         input_method = request.POST.get('input_method')
         if input_method == 'upload_excel':
+                    form = ExcelFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            excel_file = request.FILES['excel_file']
             try:
-                excel_file = request.FILES['excel_file']
                 df = pd.read_excel(excel_file)
 
                 # Validation for Excel data
@@ -69,16 +72,20 @@ def dashboard(request):
                     try:
                         item = Item(
                             name=row['name'],
-                            quantity=row['quantity'],
+                            quantity=int(row['quantity']),
                             unit=row['unit'],
-                            rate=row['rate']
+                            rate=Decimal(row['rate'])
                         )
-                        # Trigger Django model validation
+                        item.full_clean()
                         item.save()
                     except ValidationError as e:
                         messages.error(request, str(e))
-            except KeyError:
-                messages.error(request, "Please select an Excel file to upload.")
+
+                messages.success(request, "Data successfully imported from Excel file.")
+            except pd.errors.EmptyDataError:
+                messages.error(request, "The Excel file is empty.")
+            except Exception as e:
+                messages.error(request, f"An error occurred: {str(e)}")
         elif input_method == 'create_data':
                 
                 my_records = Item.objects.all()

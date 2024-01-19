@@ -5,23 +5,20 @@
 
     <hr>
 
-    
+    <div class="row">
         <div class="col-md-6">
             <form method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                 <input type="file" name="excel_file">
                 <button type="submit" class="btn btn-primary" name="upload_excel">Upload</button>
             </form>
-            <br>
-            <br>
         </div>
-        <br>
-        <a class="btn btn-outline-primary" href="{% url 'create-invoice' %}">
+        <a class="btn btn-outline-primary btn-sm" href="{% url 'create-invoice' %}">
 
             Create a new invoice &nbsp; <i class="fa fa-plus-circle" aria-hidden="true"></i>
     
         </a>
-
+    </div>
     <hr>
 
     <table class="table table-hover table-bordered">
@@ -44,9 +41,6 @@
                     <td>{{ item.quantity }}</td>
                     <td>{{ item.unit }}</td>
                     <td>{{ item.rate }}</td>
-                    <td>
-                    <a class="btn btn-success btn-sm" href="{% url 'item' item.id %}"> <i class="fa fa-eye" aria-hidden="true"></i> </a>
-                    </td>
                 </tr>
             {% endfor %}
         {% endif %}
