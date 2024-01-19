@@ -7,7 +7,7 @@ import pandas as pd
 from .models import Item
 from django.contrib import messages
 from django.forms import ValidationError
-from openpyxl import load_workbook
+import openpyxl
 from decimal import Decimal
 
 
@@ -50,53 +50,47 @@ def my_login(request):
 
 @login_required(login_url='my-login')
 def dashboard(request):
-    items = Item.objects.all()
-    form =ExcelFileForm()  # Define the form outside the conditional block
-
     if request.method == 'POST':
         input_method = request.POST.get('input_method')
+
         if input_method == 'upload_excel':
-                    form = ExcelFileForm(request.POST, request.FILES)
-        if form.is_valid():
-            excel_file = request.FILES['excel_file']
-            try:
-                df = pd.read_excel(excel_file)
-
-                # Validation for Excel data
-                required_columns = ['name', 'quantity', 'unit', 'rate']
-                if not all(column in df.columns for column in required_columns):
-                    messages.error(request, "Missing required columns in Excel file.")
-                    return redirect('dashboard')
-
-                for index, row in df.iterrows():
-                    try:
-                        item = Item(
-                            name=row['name'],
-                            quantity=int(row['quantity']),
-                            unit=row['unit'],
-                            rate=Decimal(row['rate'])
+            excel_form = ExcelFileForm(request.POST, request.FILES)
+            if excel_form.is_valid():
+                excel_file = request.FILES['excel_file']
+                try:
+                    wb = openpyxl.load_workbook(excel_file)
+                    worksheet = wb.active
+                    for row in worksheet.iter_rows(min_row=2, values_only=True):
+                        Item.objects.create(
+                            name=row[0],
+                            quantity=row[1],
+                            unit=row[2],
+                            rate=row[3]
                         )
-                        item.full_clean()
-                        item.save()
-                    except ValidationError as e:
-                        messages.error(request, str(e))
 
-                messages.success(request, "Data successfully imported from Excel file.")
-            except pd.errors.EmptyDataError:
-                messages.error(request, "The Excel file is empty.")
-            except Exception as e:
-                messages.error(request, f"An error occurred: {str(e)}")
+                    messages.success(request, "Data successfully imported from Excel file.")
+                except openpyxl.utils.exceptions.EmptySheetError:
+                    messages.error(request, "The Excel file is empty.")
+                except Exception as e:
+                    messages.error(request, f"An error occurred: {str(e)}")
+
         elif input_method == 'create_data':
-                
-                my_records = Item.objects.all()
+            create_form = CreateInvoice(request.POST)
+            if create_form.is_valid():
+                # Save data from the form to the database
+                Item.objects.create(
+                    name=create_form.cleaned_data['name'],
+                    quantity=create_form.cleaned_data['quantity'],
+                    unit=create_form.cleaned_data['unit'],
+                    rate=create_form.cleaned_data['rate']
+                )
+                messages.success(request, "Data successfully created using the form")
 
-                context = {'items': my_records}
-
-                return render(request, 'webapp/dashboard.html', context=context)
-
-    # Define the context variable here
-    context = {'form': form, 'items': items}
-    return render(request, 'webapp/dashboard.html', context=context)
+    items = Item.objects.all()
+    excel_form = ExcelFileForm()
+    create_form = CreateInvoice()
+    context = {'items': items, 'excel_form': excel_form, 'create_form': create_form}
+    return render(request, 'webapp/dashboard.html', context)
 
 
 #create invoice
