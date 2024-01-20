@@ -5,35 +5,18 @@ from django import forms
 
 from django.contrib.auth.forms import AuthenticationForm
 from django.forms.widgets import PasswordInput,TextInput
-from .models import Item
+from .models import Item,GSTIN
 
 #Register a user
 class UserRegistrationForm(UserCreationForm):
-    gstin = forms.CharField(max_length=15)
+    
     password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
     password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'gstin', 'password1', 'password2']
-        def clean_gstin(self):
-            gstin = self.cleaned_data['gstin']
-
-            if len(gstin) != 15:
-                raise forms.ValidationError("GSTIN must be 15 characters long.")
-            if not gstin.isalnum():  
-                raise forms.ValidationError("GSTIN must contain only letters and numbers.")
-
-            if not (gstin[0:2].isalpha() and gstin[2:12].isdigit() and gstin[12:].isalpha()):
-                raise forms.ValidationError("Invalid GSTIN format.")
-
-            try:
-                User.objects.get(gstin=gstin)
-                raise forms.ValidationError("GSTIN already exists.")
-            except User.DoesNotExist:
-                pass
-
-            return gstin
+        fields = ['username','email', 'password1', 'password2']
+        
         def clean_password2(self):
             password1 = self.cleaned_data.get('password1')
             password2 = self.cleaned_data.get('password2')
@@ -45,6 +28,11 @@ class UserRegistrationForm(UserCreationForm):
 class LoginForm(AuthenticationForm):
     username=forms.CharField(widget=TextInput())
     password=forms.CharField(widget=PasswordInput())
+
+class CreateGst(forms.ModelForm):
+    class Meta:
+        model=GSTIN
+        fields=['gstin_number']
     
 
 #create invoice

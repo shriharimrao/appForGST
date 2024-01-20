@@ -6,51 +6,51 @@
     <hr>
 
     <div>
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="mb-3">
-                <label for="excel_file" class="form-label">Upload Excel File</label>
-                <input type="file" class="form-control" name="excel_file" id="excel_file">
-            </div>
-            <button type="submit" class="btn btn-primary" name="input_method" value="upload_excel">Upload</button>
-        </form>
+        <a class="btn btn-outline-primary btn-sm" href="{% url 'Upload-invoice' gstin.gstin_number %}">
+            Invoice Bulk Upload &nbsp; <i class="fa fa-plus-circle" aria-hidden="true"></i>
+        </a>
     </div>
-
+        or
     <div class="mt-3">
-        <a class="btn btn-outline-primary btn-sm" href="{% url 'create-invoice' %}">
+        <a class="btn btn-outline-primary btn-sm" href="{% url 'create-invoice' gstin.gstin_number %}">
             Create a new invoice &nbsp; <i class="fa fa-plus-circle" aria-hidden="true"></i>
         </a>
     </div>
 
     <hr>
 
-    <table class="table table-hover table-bordered">
+    <table class="table table-bordered table-hover">
         <thead class="table-light">
-        <tr>
-            <th scope="col">ID</th>
-            <th scope="col">Name</th>
-            <th scope="col">Quantity</th>
-            <th scope="col">Unit</th>
-            <th scope="col">Rate</th>
-            <th scope="col">Views</th>
-        </tr>
+            <tr>
+                <th scope="col">GSTIN</th>
+                <th scope="col">Name</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Unit</th>
+                <th scope="col">Rate</th>
+                <th scope="col">Actions</th>
+            </tr>
         </thead>
         <tbody>
-        {% if items %}
-            {% for item in items %}
-                <tr>
-                    <td>{{ item.id }}</td>
-                    <td>{{ item.name }}</td>
-                    <td>{{ item.quantity }}</td>
-                    <td>{{ item.unit }}</td>
-                    <td>{{ item.rate }}</td>
-                    
-                    <td> <a class="btn btn-success btn-sm" href="{% url 'item' item.id %}"> <i class="fa fa-eye" aria-hidden="true"></i> </a> </td>
-                
-                </tr>
-            {% endfor %}
-        {% endif %}
+            {% if items %}
+                {% for item in items %}
+                    <tr>
+                        <td>{{ item.gstin.gstin_number}}</td>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.unit }}</td>
+                        <td>{{ item.rate }}</td>
+                        
+                        <td>
+                            <a class="btn btn-success btn-sm" href="{% url 'update-invoice' item.pk %}">
+                                <i class="fa fa-eye" aria-hidden="true"></i>Edit Invoice
+                            </a>
+                            <a class="btn btn-danger btn-sm" href="{% url 'delete_invoice' item.pk %}">Delete Invoice</a>
+
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
         </tbody>
     </table>
-
+ad
 {% endblock %}
