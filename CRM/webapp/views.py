@@ -12,13 +12,12 @@ from .forms import (
 from django.contrib.auth.models import auth
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
-import pandas as pd
 from .models import GSTIN, Item
 from django.contrib import messages
 from django.forms import ValidationError
 import openpyxl
-from decimal import Decimal
 from django.urls import reverse
+import re
 
 
 # home page
@@ -61,21 +60,34 @@ def gstview(request):
     items = GSTIN.objects.all()
     return render(request, "webapp/gst_list.html", context={"items": items})
 
-
-# creategst
+#create gstin
 @login_required(login_url="my-login")
 def creategstinform(request):
     form = CreateGst()
     if request.method == "POST":
         form = CreateGst(request.POST)
         if form.is_valid():
-            gstin_object = form.save()
-            dashboard_url = reverse(
-                "dashboard", kwargs={"gstin": gstin_object.gstin_number}
-            )
-            return redirect(dashboard_url)
+            gstin = form.cleaned_data['gstin_number']
+            regex_pattern = "^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$"
+            if not re.match(regex_pattern, gstin):
+                form.add_error('gstin_number', 'Invalid GSTIN format')
+            else:
+                gstin_object = form.save()
+                dashboard_url = reverse("dashboard", kwargs={"gstin": gstin_object.gstin_number})
+                return redirect(dashboard_url)
+
     context = {"form": form}
     return render(request, "webapp/create_gstin.html", context=context)
+
+#delete gstin
+
+def delete_gst(request, gstin):
+    try:
+        gstin_instance = GSTIN.objects.get(gstin_number=gstin)
+        gstin_instance.delete()
+    except GSTIN.DoesNotExist:
+        messages.error(request, 'GSTIN not found.')
+    return  redirect("gstview")
 
 
 # dashboard
@@ -152,7 +164,7 @@ def update_item(request, pk):
     return render(request, "webapp/update-item.html", context=context)
 
 
-# delete invoice
+# delete item
 @login_required(login_url="my-login")
 def delete_item(request, pk):
     item = Item.objects.get(id=pk)

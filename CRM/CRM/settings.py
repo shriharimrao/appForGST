@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "webapp",
     "crispy_forms",
-    "pandas",
     "openpyxl",
     "django_extensions",
 ]

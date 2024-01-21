@@ -7,7 +7,9 @@ urlpatterns = [
     path("register", views.register, name="register"),
     path("my-login", views.my_login, name="my-login"),
     path("gst-view", views.gstview, name="gstview"),
+    
     path("create-gstin", views.creategstinform, name="creategstinform"),
+   path('delete-gst/<str:gstin>', views.delete_gst, name='delete-gst'),
     path("user-logout", views.user_logout, name="user-logout"),
     # CRUD
     path("dashboard/<str:gstin>", views.dashboard, name="dashboard"),

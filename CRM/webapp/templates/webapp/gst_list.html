@@ -1,9 +1,10 @@
-{% extends 'webapp/base.html' %} 
+{% extends 'webapp/base.html' %}
+
 {% block content %}
   <h5>Welcome, {{ user }}!</h5>
 
   <hr />
-  <a class="btn btn-success btn-sm mb-2" href="{% url 'creategstinform'%}">
+  <a class="btn btn-success btn-sm mb-2" href="{% url 'creategstinform' %}">
     <i class="fa fa-plus-square" aria-hidden="true"></i> Add GSTIN
   </a>
 
@@ -11,18 +12,26 @@
     <thead class="table-light">
       <tr>
         <th scope="col">GSTIN</th>
+        <th scope="col">Actions</th>
       </tr>
     </thead>
     <tbody>
-      {% if items %} {% for gstin in items %}
-      <tr>
-        <td>
-          <a href="{% url 'dashboard' gstin=gstin.gstin_number %}"
-            >{{ gstin.gstin_number }}</a
-          >
-        </td>
-      </tr>
-      {% endfor %} {% endif %}
+      {% if items %} 
+        {% for gstin in items %}
+          <tr>
+            <td>
+              <a href="{% url 'dashboard' gstin=gstin.gstin_number %}">
+                {{ gstin.gstin_number }}
+              </a>
+            </td>
+            <td>
+              <a href="{% url 'delete-gst' gstin=gstin.gstin_number %}" class="btn btn-danger btn-sm">
+                <i class="fa fa-trash" aria-hidden="true"></i> Delete
+              </a>
+            </td>
+          </tr>
+        {% endfor %}
+      {% endif %}
     </tbody>
   </table>
 
