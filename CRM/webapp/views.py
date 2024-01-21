@@ -4,8 +4,8 @@ from django.shortcuts import get_object_or_404
 from .forms import (
     UserRegistrationForm,
     LoginForm,
-    CreateInvoice,
-    UpdateInvoice,
+    CreateItem,
+    UpdateItem,
     ExcelFileForm,
     CreateGst,
 )
@@ -23,7 +23,8 @@ from django.urls import reverse
 
 # home page
 def home(request):
-    return render(request, "webapp/index.html")
+    is_loggedin = request.user.is_authenticated
+    return render(request, "webapp/index.html", context={"is_loggedin": is_loggedin})
 
 
 # register
@@ -31,7 +32,6 @@ def register(request):
     form = UserRegistrationForm()
     if request.method == "POST":
         form = UserRegistrationForm(request.POST)
-
         if form.is_valid():
             form.save()
             return redirect("my-login")
@@ -47,9 +47,7 @@ def my_login(request):
         if form.is_valid():
             username = request.POST.get("username")
             password = request.POST.get("password")
-
             user = authenticate(request, username=username, password=password)
-
             if user is not None:
                 auth.login(request, user)
                 return redirect("gstview")
@@ -72,7 +70,6 @@ def creategstinform(request):
         form = CreateGst(request.POST)
         if form.is_valid():
             gstin_object = form.save()
-            print("GSTIN_OBJ", gstin_object.__dict__)
             dashboard_url = reverse(
                 "dashboard", kwargs={"gstin": gstin_object.gstin_number}
             )
@@ -90,14 +87,12 @@ def dashboard(request, gstin):
     return render(request, "webapp/dashboard.html", context)
 
 
-# create invoice
+# create item list
 @login_required(login_url="my-login")
-def create_invoice(request, gstin):
-    print("GSTIN", gstin)
-    print("IFGSTIN INTSCE", isinstance(gstin, GSTIN))
-    form = CreateInvoice()
+def create_item(request, gstin):
+    form = CreateItem()
     if request.method == "POST":
-        form = CreateInvoice(request.POST)
+        form = CreateItem(request.POST)
         if form.is_valid():
             invoice_object = form.save(commit=False)
             gstin = get_object_or_404(GSTIN, gstin_number=gstin)
@@ -106,21 +101,16 @@ def create_invoice(request, gstin):
             dashboard_url = reverse("dashboard", kwargs={"gstin": gstin.gstin_number})
             return redirect(dashboard_url)
     context = {"form": form}
-    return render(request, "webapp/create-invoice.html", context=context)
+    return render(request, "webapp/create-item.html", context=context)
 
 
 # upload invoice
 @login_required(login_url="my-login")
-def Upload_invoice(request, gstin):
+def Upload_item(request, gstin):
     excel_form = ExcelFileForm()
-    print("Request method", request.method)
     if request.method == "POST":
         input_method = request.POST.get("input_method")
-        print("Input Method", input_method)
         if input_method == "upload_excel":
-            # excel_form = ExcelFileForm(request.POST, request.FILES)
-
-            print("is valid")
             excel_file = request.FILES["excel_file"]
             try:
                 wb = openpyxl.load_workbook(excel_file)
@@ -129,33 +119,29 @@ def Upload_invoice(request, gstin):
                 for name, quantity, unit, rate in worksheet.iter_rows(
                     min_row=2, values_only=True
                 ):
-                    print(name, quantity, unit, rate)
                     Item.objects.create(
                         name=name, quantity=quantity, unit=unit, rate=rate, gstin=gstin
                     )
-
                 messages.success(request, "Data successfully imported from Excel file.")
                 dashboard_url = reverse(
                     "dashboard", kwargs={"gstin": gstin.gstin_number}
                 )
                 return redirect(dashboard_url)
-
             except openpyxl.utils.exceptions.EmptySheetError:
                 messages.error(request, "The Excel file is empty.")
             except Exception as e:
                 messages.error(request, f"An error occurred: {str(e)}")
-
     context = {"excel_form": excel_form}
-    return render(request, "webapp/Upload-invoice.html", context=context)
+    return render(request, "webapp/Upload-item.html", context=context)
 
 
 # update invoice
 @login_required(login_url="my-login")
-def update_invoice(request, pk):
+def update_item(request, pk):
     item = Item.objects.get(id=pk)
-    form = UpdateInvoice(instance=item)
+    form = UpdateItem(instance=item)
     if request.method == "POST":
-        form = UpdateInvoice(request.POST, instance=item)
+        form = UpdateItem(request.POST, instance=item)
         if form.is_valid():
             item_object = form.save()
             dashboard_url = reverse(
@@ -163,27 +149,12 @@ def update_invoice(request, pk):
             )
             return redirect(dashboard_url)
     context = {"form": form, "item": item}
-    return render(request, "webapp/update-invoice.html", context=context)
-
-
-# view single record
-@login_required(login_url="my-login")
-def singular_invoice(request, pk):
-    all_records = Item.objects.get(id=pk)
-
-    context = {"item": all_records}
-
-    return render(request, "webapp/view-invoice.html", context=context)
+    return render(request, "webapp/update-item.html", context=context)
 
 
 # delete invoice
 @login_required(login_url="my-login")
-def delete_invoice(request, pk):
-    """
-    request : request,
-    pk : ID of Invoice
-    returns : Dashboard URL
-    """
+def delete_item(request, pk):
     item = Item.objects.get(id=pk)
     if item:
         item.delete()

@@ -1,77 +1,27 @@
-
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary justify-content-center">
+  <a class="navbar-brand main-heading" href="{% url '' %}">
+      GSTin Management
+  </a>
 
-    <a class="navbar-brand main-heading" href="{% url '' %}"> 
-            
-    &nbsp; GSTin Management
-    
-    </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
+      aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+  </button>
 
-
-    <button
-    class="navbar-toggler"
-    type="button"
-    data-toggle="collapse"
-    data-target="#navbarNavDropdown"
-    aria-controls="navbarNavDropdown"
-    aria-expanded="false"
-    aria-label="Toggle navigation"
-    >
-    <span class="navbar-toggler-icon"></span>
-
-    </button>
-
-
-    <div class="collapse navbar-collapse text-center" id="navbarNavDropdown">
-
-        
-        <ul class="navbar-nav mr-auto">
-
-
-        &nbsp;     &nbsp;     &nbsp; 
-
-        {% if user.is_authenticated %}
-
-
-
-            &nbsp;     &nbsp;     &nbsp; 
-
-
-            <li class="nav-item">
-
-            <a class="nav-link" href="{% url 'user-logout' %}">Sign out &nbsp; <i class="fa fa-sign-out" aria-hidden="true"></i> </a>
-
-            </li>
-
-
-        </ul>
-
-        {% else %}
-
-        <li class="nav-item">
-
-        <a class="nav-link" href="{% url 'register' %}"> Register </a>
-
-        </li>
-
-
-        &nbsp;     &nbsp;     &nbsp; 
-
-
-        <li class="nav-item">
-
-        <a class="nav-link" href="{% url 'my-login' %}">Login</a>
-
-        </li>
-
-
-        {% endif %}
-    
-        
-    </div>
-
-
+  <div class="collapse navbar-collapse text-center" id="navbarNavDropdown">
+      <ul class="navbar-nav mr-auto">
+          {% if user.is_authenticated %}
+              <li class="nav-item">
+                  <a class="nav-link" href="{% url 'user-logout' %}">Sign out <i class="fa fa-sign-out" aria-hidden="true"></i></a>
+              </li>
+          {% else %}
+              <li class="nav-item">
+                  <a class="nav-link" href="{% url 'register' %}">Register</a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link" href="{% url 'my-login' %}">Login</a>
+              </li>
+          {% endif %}
+      </ul>
+  </div>
 </nav>
-
-
-

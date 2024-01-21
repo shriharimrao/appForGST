@@ -1,25 +1,31 @@
 {% extends 'webapp/base.html' %}
 
 {% block content %}
-    <h5>Welcome, {{ user }}! </h5>
+    <h5>Welcome, {{ user }}!</h5>
 
-    <hr>
+    <hr />
 
-    <div>
-        <a class="btn btn-outline-primary btn-sm" href="{% url 'Upload-invoice' gstin.gstin_number %}">
-            Invoice Bulk Upload &nbsp; <i class="fa fa-plus-circle" aria-hidden="true"></i>
-        </a>
+    <div class="row">
+        <div class="col-md-4">
+            <a class="btn btn-outline-primary btn-sm" href="{% url 'Upload-item' gstin.gstin_number %}">
+                Invoice Bulk Upload &nbsp; <i class="fa fa-plus-circle" aria-hidden="true"></i>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a class="btn btn-outline-primary btn-sm" href="{% url 'create-item' gstin.gstin_number %}">
+                Create a new item list &nbsp; <i class="fa fa-plus-circle" aria-hidden="true"></i>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a class="btn btn-outline-primary btn-sm" href="{% url 'gstview' %}">
+                Return &nbsp; <i class="fa fa-arrow-left" aria-hidden="true"></i>
+            </a>
+        </div>
     </div>
-        or
-    <div class="mt-3">
-        <a class="btn btn-outline-primary btn-sm" href="{% url 'create-invoice' gstin.gstin_number %}">
-            Create a new invoice &nbsp; <i class="fa fa-plus-circle" aria-hidden="true"></i>
-        </a>
-    </div>
 
-    <hr>
+    <hr />
 
-    <table class="table table-bordered table-hover">
+    <table class="table table-bordered table-dark text-center">
         <thead class="table-light">
             <tr>
                 <th scope="col">GSTIN</th>
@@ -34,23 +40,24 @@
             {% if items %}
                 {% for item in items %}
                     <tr>
-                        <td>{{ item.gstin.gstin_number}}</td>
+                        <td>{{ item.gstin.gstin_number }}</td>
                         <td>{{ item.name }}</td>
                         <td>{{ item.quantity }}</td>
                         <td>{{ item.unit }}</td>
                         <td>{{ item.rate }}</td>
-                        
-                        <td>
-                            <a class="btn btn-success btn-sm" href="{% url 'update-invoice' item.pk %}">
-                                <i class="fa fa-eye" aria-hidden="true"></i>Edit Invoice
-                            </a>
-                            <a class="btn btn-danger btn-sm" href="{% url 'delete_invoice' item.pk %}">Delete Invoice</a>
 
+                        <td>
+                            <a class="btn btn-success btn-sm" href="{% url 'update-item' item.pk %}">
+                                <i class="fa fa-eye" aria-hidden="true"></i>Edit Item
+                            </a>
+                            <a class="btn btn-danger btn-sm" href="{% url 'delete_item' item.pk %}">
+                                <i class="fa fa-trash" aria-hidden="true"></i>Delete Item
+                            </a>
                         </td>
                     </tr>
                 {% endfor %}
             {% endif %}
         </tbody>
     </table>
-ad
+
 {% endblock %}

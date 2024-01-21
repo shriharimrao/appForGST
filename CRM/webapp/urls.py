@@ -11,9 +11,8 @@ urlpatterns = [
     path("user-logout", views.user_logout, name="user-logout"),
     # CRUD
     path("dashboard/<str:gstin>", views.dashboard, name="dashboard"),
-    path("<str:gstin>/create-invoice", views.create_invoice, name="create-invoice"),
-    path("<str:gstin>/Upload-invoice", views.Upload_invoice, name="Upload-invoice"),
-    path("update-invoice/<int:pk>", views.update_invoice, name="update-invoice"),
-    path("item/<int:pk>", views.singular_invoice, name="item"),
-    path("delete-invoice/<int:pk>", views.delete_invoice, name="delete_invoice"),
+    path("<str:gstin>/create-item", views.create_item, name="create-item"),
+    path("<str:gstin>/Upload-item", views.Upload_item, name="Upload-item"),
+    path("update-item/<int:pk>", views.update_item, name="update-item"),
+    path("delete-item/<int:pk>", views.delete_item, name="delete_item"),
 ]

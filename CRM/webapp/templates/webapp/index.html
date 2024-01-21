@@ -3,24 +3,28 @@
 {% block content %}
     
     <body>
-
-        <br>
-        <br>
-
-        <div class="text-center">
-
-            <h3>GSTin Management</h3>
-
+        {% if is_loggedin %}
+            <h3>GSTIN Management</h3>
             <br>
-
             <h5> one stop for all the GST solutions </h5>
+            <div class="mt-3">
+                <a class="btn btn-outline-primary" href="{% url 'gstview' %}">
+                    return &nbsp; </i>
+                </a>
+            </div>
+        {% endif %}
 
-            <hr>
-            <br>
+        {% if not is_loggedin %}
 
-            <a class="btn btn-primary" type="button" href="{% url 'register' %}"> Create your account &nbsp; <i class="fa fa-user-plus" aria-hidden="true"></i> </a>
-
-        </div>
+            <div class="text-center">
+                <h3>GSTIN Management</h3>
+                <br>
+                <h5> one stop for all the GST solutions </h5>
+                <hr>
+                <br>
+                    <a class="btn btn-primary" type="button" href="{% url 'register' %}"> Create your account &nbsp; <i class="fa fa-user-plus" aria-hidden="true"></i> </a>
+            </div>
+        {% endif %}
 
     </body>
 

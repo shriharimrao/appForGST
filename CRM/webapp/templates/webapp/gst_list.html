@@ -1,26 +1,29 @@
-{% extends 'webapp/base.html' %}
-
+{% extends 'webapp/base.html' %} 
 {% block content %}
-    <h5>Welcome, {{ user }}! </h5>
+  <h5>Welcome, {{ user }}!</h5>
 
-    <hr>
-    <a class="btn btn-success btn-sm mb-2" href="{% url 'creategstinform'%}"> <i class="fa fa-eye" aria-hidden="true"></i> Add GSTIN </a>
+  <hr />
+  <a class="btn btn-success btn-sm mb-2" href="{% url 'creategstinform'%}">
+    <i class="fa fa-plus-square" aria-hidden="true"></i> Add GSTIN
+  </a>
 
-    <table class="table table-hover table-bordered">
-        <thead class="table-light">
-        <tr>
-            <th scope="col">GSTIN</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% if items %}
-            {% for gstin in items %}
-                <tr>
-                    <td><a href="{% url 'dashboard' gstin=gstin.gstin_number %}">{{ gstin.gstin_number }}</a></td>
-                </tr>
-            {% endfor %}
-        {% endif %}
-        </tbody>
-    </table>
+  <table class="table table-hover table-bordered">
+    <thead class="table-light">
+      <tr>
+        <th scope="col">GSTIN</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if items %} {% for gstin in items %}
+      <tr>
+        <td>
+          <a href="{% url 'dashboard' gstin=gstin.gstin_number %}"
+            >{{ gstin.gstin_number }}</a
+          >
+        </td>
+      </tr>
+      {% endfor %} {% endif %}
+    </tbody>
+  </table>
 
 {% endblock %}
