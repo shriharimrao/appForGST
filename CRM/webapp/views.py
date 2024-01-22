@@ -116,7 +116,7 @@ def create_item(request, gstin):
     return render(request, "webapp/create-item.html", context=context)
 
 
-# upload invoice
+# upload items
 @login_required(login_url="my-login")
 def Upload_item(request, gstin):
     excel_form = ExcelFileForm()
@@ -147,7 +147,7 @@ def Upload_item(request, gstin):
     return render(request, "webapp/Upload-item.html", context=context)
 
 
-# update invoice
+# update item
 @login_required(login_url="my-login")
 def update_item(request, pk):
     item = Item.objects.get(id=pk)
