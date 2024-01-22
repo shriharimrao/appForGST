@@ -39,14 +39,14 @@ class CreateItem(forms.ModelForm):
         fields = ["name", "quantity", "unit", "rate"]
 
 
-# upload invoice
+# upload item
 class ExcelFileForm(forms.ModelForm):
     class Meta:
         model = Item
         fields = ["name", "quantity", "unit", "rate"]
 
 
-# update invoice
+# update item
 class UpdateItem(forms.ModelForm):
     class Meta:
         model = Item
